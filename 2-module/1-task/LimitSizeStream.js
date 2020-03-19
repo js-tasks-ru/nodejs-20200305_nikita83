@@ -15,7 +15,8 @@ class LimitSizeStream extends stream.Transform {
     this._count <= this._limit
       ? callback(null, str)
       : callback(new LimitExceededError());
-  }
+ 
+    }
 }
 
 module.exports = LimitSizeStream;
