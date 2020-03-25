@@ -4,7 +4,19 @@ const path = require("path");
 const fs = require("fs");
 const LimitSizeStream = require("./LimitSizeStream");
 
-const server = http.createServer((req, res) => {
+const server = new http.Server();
+
+const reqData = (req, callback) => {
+  let body = [];
+  req.on("data", chunk => {
+    body.push(chunk);
+  });
+  req.on("end", () => {
+    callback((body = Buffer.concat(body)));
+  });
+};
+
+server.on("request", (req, res) => {
   const pathname = url.parse(req.url).pathname.slice(1);
 
   const filepath = path.join(__dirname, "files", pathname);
@@ -19,18 +31,9 @@ const server = http.createServer((req, res) => {
     case "POST":
       if (fs.existsSync(filepath)) {
         res.statusCode = 409;
-        res.end();
+        res.end("file already have");
         return;
       }
-      const reqData = (req, callback) => {
-        let body = [];
-        req.on("data", chunk => {
-          body.push(chunk);
-        });
-        req.on("end", () => {
-          callback((body = Buffer.concat(body)));
-        });
-      };
 
       reqData(req, data => {
         const limitSizeStream = new LimitSizeStream({ limit: 10000 });
@@ -50,7 +53,7 @@ const server = http.createServer((req, res) => {
           res.end();
         });
 
-        if (data.length > 0 && data.length !== undefined) {
+        if (data.length) {
           limitSizeStream.write(data);
           limitSizeStream.end();
         }
