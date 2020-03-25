@@ -16,21 +16,6 @@ const server = http.createServer((req, res) => {
   }
 
   switch (req.method) {
-    case "GET":
-      fs.stat(filepath, err => {
-        if (err) {
-          res.statusCode = 404;
-          res.end("File not folder");
-        }
-        const fileStream = fs.createReadStream(filepath, "utf8");
-        fileStream.on("data", chunk => {
-          res.end(chunk);
-        });
-        fileStream.on("error", () => {
-          fileStream.destroy();
-        });
-      });
-
     case "POST":
       if (fs.existsSync(filepath)) {
         res.statusCode = 409;
