@@ -7,7 +7,6 @@ const server = new http.Server();
 server.on("request", (req, res) => {
   const pathname = url.parse(req.url).pathname.slice(1);
   const urlLength = pathname.split("/").length;
-  console.log(urlLength);
   if (urlLength > 1) {
     res.statusCode = 400;
     res.end("No correct request");
