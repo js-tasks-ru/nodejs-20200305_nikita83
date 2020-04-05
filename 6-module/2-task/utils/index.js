@@ -13,7 +13,7 @@ module.exports = function transform(data, key) {
         return {
           id: _id,
           title,
-          subcategories: transformResponse(subcategories, 'subcategories'),
+          subcategories: transform(subcategories, 'subcategories'),
         };
       });
 
