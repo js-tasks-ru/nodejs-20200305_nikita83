@@ -1,12 +1,35 @@
-module.exports.productsBySubcategory = async function productsBySubcategory(ctx, next) {
-  ctx.body = {};
+const mongoose = require('mongoose');
+const Product = require('../models/Product');
+const transform = require('../utils/index');
+
+module.exports.productsBySubcategory = async function productsBySubcategory(
+  ctx,
+  next,
+) {
+  const { subcategory } = ctx.request.query;
+
+  if (!subcategory) return next();
+
+  const products = await Product.find({ subcategory });
+
+  ctx.body = { products: transform(products, 'products') };
 };
 
 module.exports.productList = async function productList(ctx, next) {
-  ctx.body = {};
+  const products = await Product.find();
+
+  ctx.body = { products: transform(products, 'products') };
 };
 
 module.exports.productById = async function productById(ctx, next) {
-  ctx.body = {};
-};
+  const { id } = ctx.params;
 
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return ctx.throw(400, 'Invalid product id');
+
+  const product = await Product.findById(id);
+
+  if (!product) return ctx.throw(404);
+
+  ctx.body = { product: transform(product, 'product') };
+};
